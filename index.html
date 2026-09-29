@@ -606,9 +606,11 @@ function contact(){
   try{
    const r=await fetch(FORM_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)});
    const j=await r.json().catch(()=>({}));
-   if(!r.ok||String(j.success)==='false')throw new Error(j.message||'failed');
+   if(/activat/i.test(j.message||'')){show('err','This form is being set up. Your details were received, but the form owner must first click the activation link sent to '+EMAIL+'. Meanwhile, please WhatsApp <strong>'+PHONE+'</strong>.');return;}
+   if(!r.ok||String(j.success)==='false')throw new Error(j.message||('HTTP '+r.status));
    f.reset();show('ok','Thank you, '+name.replace(/</g,'')+'. Your request has reached our team. We will reply within one business day.');
   }catch(err){
+   console.warn('Form error:',err&&err.message);
    show('err','We could not send your request right now. Please email <strong>'+EMAIL+'</strong> or WhatsApp <strong>'+PHONE+'</strong> and we will reply quickly.');
   }finally{btn.disabled=false;btn.textContent='Send request';}
  });
