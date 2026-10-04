@@ -132,13 +132,18 @@ section{padding-block:72px}
 .arrows button{width:42px;height:42px;border-radius:50%;border:1px solid var(--edge);background:var(--glass-2);color:var(--ink);cursor:pointer;font:600 18px var(--body);box-shadow:0 4px 14px -8px rgba(15,28,56,.3);transition:background .2s,opacity .2s}
 .arrows button:hover:not(:disabled){background:var(--navy);color:#fff}
 .arrows button:disabled{opacity:.3;cursor:default}
-.rail{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:20px;padding:6px 20px 26px;margin-inline:-20px;scrollbar-width:none;overscroll-behavior-x:contain}
+.rail{--gap:18px;--per:3;display:flex;gap:var(--gap);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:6px;padding:8px 6px 22px;margin-inline:-6px;scrollbar-width:none;overscroll-behavior-x:contain;scroll-behavior:smooth}
 .rail::-webkit-scrollbar{display:none}
-.rail>.pcard{flex:0 0 clamp(260px,30%,330px);scroll-snap-align:start}
+.rail>.pcard{flex:0 0 calc((100% - (var(--per) - 1) * var(--gap)) / var(--per));scroll-snap-align:start;min-width:0}
+.dots{display:flex;justify-content:center;gap:8px;min-height:10px}
+.dots button{width:9px;height:9px;padding:0;border-radius:999px;border:0;background:rgba(15,28,56,.18);cursor:pointer;transition:width .25s,background .25s}
+.dots button[aria-current="true"]{width:26px;background:var(--orange)}
+.railbox.single .arrows,.railbox.single .dots{visibility:hidden}
+@media (max-width:900px){.rail{--per:2}}
 .rail .pcard .shot{height:172px}
 .rail .tag{display:none}
 .rows{display:grid;gap:44px}
-@media (max-width:600px){.rail>.pcard{flex-basis:80%}.arrows{display:none}.rail{gap:14px}}
+@media (max-width:600px){.rail{--per:1;--gap:14px}.arrows{display:none}}
 
 /* solutions toolbar, goals, results */
 .goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px;margin-bottom:28px}
@@ -315,7 +320,9 @@ table.inv{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 input,select,textarea{width:100%;max-width:100%;min-width:0}
 @media (max-width:560px){.contact form,.mailbox{padding:22px}.wa-float{width:52px;height:52px;right:16px}.wa-float svg{width:26px;height:26px}.pd{padding:28px 22px}.pagehead{padding:32px 22px}}
 .mailbox{display:grid;gap:14px}
-.mail{font:500 clamp(18px,2.4vw,22px) var(--mono);word-break:break-all;user-select:all}
+.mail{font:500 clamp(18px,2.4vw,22px) var(--mono);word-break:break-all}
+.mlink{color:var(--ink);text-decoration:none;justify-self:start;border-bottom:2px solid rgba(232,99,26,.35);transition:color .2s,border-color .2s}
+.mlink:hover{color:var(--orange-soft);border-color:var(--orange)}
 form{display:grid;gap:14px}
 label{display:grid;gap:6px;font:500 14px var(--body)}
 input,select,textarea{background:#fff;border:1px solid rgba(15,28,56,.16);border-radius:14px;padding:12px 14px;color:var(--ink);font:400 16px var(--body);box-shadow:inset 0 1px 2px rgba(15,28,56,.06)}
@@ -585,7 +592,7 @@ const process=()=>`<section><div class="wrap"><div class="head"><span class="eye
 <div class="step g"><span class="dot"></span><h3>Launch &amp; grow</h3><p>We go live, measure results and keep improving with you.</p></div></div></div></section>`;
 
 const arrowsHtml=`<div class="arrows"><button type="button" data-dir="-1" aria-label="Previous">←</button><button type="button" data-dir="1" aria-label="Next">→</button></div>`;
-const rail=(title,items,extra='')=>`<div class="railbox"><div class="railhead"><div>${title}</div><div class="right">${extra}${arrowsHtml}</div></div><div class="rail">${items.map(card).join('')}</div></div>`;
+const rail=(title,items,extra='')=>`<div class="railbox"><div class="railhead"><div>${title}</div><div class="right">${extra}${arrowsHtml}</div></div><div class="rail">${items.map(card).join('')}</div><div class="dots" role="tablist" aria-label="Slides"></div></div>`;
 const CATS=['Systems & Apps','AI Automation','Marketing','Data & AI'];
 const GOALS=[
  ['Get more customers',['content-studio','social-planner','ads-optimizer','seo-tracker','review-manager','lead-followup','email-sms']],
@@ -691,9 +698,10 @@ contact:()=>`<div class="wrap"><div class="pagehead g"><span class="eyebrow">Con
 </form>
 <div class="mailbox g">
 <span class="eyebrow">Talk to us directly</span>
-<div class="cline"><span class="muted" style="font-size:14px">Phone and WhatsApp</span><span class="mail">${PHONE}</span></div>
+<div class="cline"><span class="muted" style="font-size:14px">Phone and WhatsApp</span><a class="mail mlink" href="tel:${TEL}">${PHONE}</a></div>
 <div class="cta"><a class="btn wa" href="https://wa.me/${WA}" target="_blank" rel="noopener">Chat on WhatsApp</a><a class="btn ghost" href="tel:${TEL}">Call us</a></div>
-<div class="cline" style="margin-top:8px"><span class="muted" style="font-size:14px">Email</span><span class="mail" id="mail">${EMAIL}</span></div>
+<div class="cline" style="margin-top:8px"><span class="muted" style="font-size:14px">Email</span><a class="mail mlink" id="mail" href="mailto:${EMAIL}?subject=${encodeURIComponent('Enquiry from the MecQuad website')}">${EMAIL}</a></div>
+<div class="cta"><a class="btn" href="mailto:${EMAIL}?subject=${encodeURIComponent('Enquiry from the MecQuad website')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Email us</a></div>
 <p class="muted" style="font-size:15px">Colombo, Sri Lanka · Working remotely with clients worldwide.</p></div>
 </div></section>`
 };
@@ -758,9 +766,22 @@ function filters(){
  document.getElementById('sq').addEventListener('input',e=>{ST.q=e.target.value;ST.goal=null;ST.cat='All';solView();});
  document.getElementById('sview').addEventListener('click',e=>{if(e.target.id==='sclear'){ST.cat='All';ST.goal=null;ST.q='';document.getElementById('sq').value='';solView();}});
 }
-function upd(r){const b=r.closest('.railbox')?.querySelectorAll('.arrows button');if(!b)return;b[0].disabled=r.scrollLeft<8;b[1].disabled=r.scrollLeft+r.clientWidth>=r.scrollWidth-8;}
+function geo(r){const c=r.querySelector('.pcard');if(!c)return null;const gap=parseFloat(getComputedStyle(r).columnGap)||18;const step=c.offsetWidth+gap;const per=Math.max(1,Math.round((r.clientWidth-12+gap)/step));const n=r.children.length;return{step,per,pages:Math.max(1,Math.ceil(n/per))};}
+function upd(r){const box=r.closest('.railbox');if(!box)return;const g=geo(r);if(!g)return;
+ const atEnd=r.scrollLeft+r.clientWidth>=r.scrollWidth-8;
+ const page=atEnd?g.pages-1:Math.min(g.pages-1,Math.round(r.scrollLeft/(g.step*g.per)));
+ box.classList.toggle('single',g.pages<=1);
+ const d=box.querySelector('.dots');
+ if(d){if(d.children.length!==g.pages){d.innerHTML=Array.from({length:g.pages},(_,i)=>`<button type="button" role="tab" aria-label="Slide ${i+1} of ${g.pages}" data-page="${i}"></button>`).join('');}
+  [...d.children].forEach((b,i)=>b.setAttribute('aria-current',String(i===page)));}
+ const b=box.querySelectorAll('.arrows button');if(b.length){b[0].disabled=r.scrollLeft<8;b[1].disabled=r.scrollLeft+r.clientWidth>=r.scrollWidth-8;}}
 function rails(){document.querySelectorAll('.rail').forEach(upd);}
-document.addEventListener('click',e=>{const b=e.target.closest('.arrows button');if(!b)return;const r=b.closest('.railbox').querySelector('.rail');r.scrollBy({left:+b.dataset.dir*r.clientWidth*.85,behavior:'smooth'});});
+document.addEventListener('click',e=>{
+ const b=e.target.closest('.arrows button'),dot=e.target.closest('.dots button');if(!b&&!dot)return;
+ const r=(b||dot).closest('.railbox').querySelector('.rail'),g=geo(r);if(!g)return;
+ if(b){const atEnd=r.scrollLeft+r.clientWidth>=r.scrollWidth-8;const cur=atEnd?g.pages-1:Math.round(r.scrollLeft/(g.step*g.per));const page=cur+(+b.dataset.dir);r.scrollTo({left:Math.max(0,page)*g.step*g.per,behavior:'smooth'});}
+ else r.scrollTo({left:+dot.dataset.page*g.step*g.per,behavior:'smooth'});
+});
 document.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('rail'))upd(e.target);},true);
 addEventListener('resize',rails);
 async function copyText(t,el,ok){try{await navigator.clipboard.writeText(t);el.textContent=ok;return true}catch(e){return false}}
