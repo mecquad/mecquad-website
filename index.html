@@ -613,8 +613,8 @@ home:()=>`<div class="wrap hero"><div>
 <p>MecQuad turns ideas into intelligent technology. We build custom software, AI solutions, data insights, mobile apps and digital marketing for businesses in Sri Lanka and around the world.</p>
 <div class="cta"><a class="btn" href="#contact">Book a free consultation</a><a class="btn ghost" href="#solutions">Explore solutions</a></div></div>
 <div class="stage g" aria-label="E equals M C squared turning into the MecQuad mark"><canvas id="eq"></canvas><div class="cap"><span>MASS</span><span>→</span><span>ENERGY</span></div></div></div>
-<section><div class="wrap"><div class="head"><span class="eyebrow">Ready-to-deploy solutions</span><h2>Built, tested and ready to customise for your business.</h2><p class="muted">Swipe through our most popular solutions. Each one is tailored to your brand, data and workflow.</p></div>
-${rail('<h3>Popular solutions</h3>',['pos','whatsapp-ai','billing','meta-ai','content-studio','marketing-analyzer','ai-receptionist','data-analytics','mobile-apps'].map(i=>byId[i]),`<a class="see" href="#solutions">See all ${S.length} →</a>`)}</div></section>
+<section><div class="wrap"><div class="head"><span class="eyebrow">Our solutions</span><h2>20+ solutions, tailored to your business.</h2><p class="muted">Swipe through our most popular ones. We adapt each one to your brand, data and workflow.</p></div>
+${rail('<h3>Popular solutions</h3>',['pos','whatsapp-ai','billing','meta-ai','content-studio','marketing-analyzer','ai-receptionist','data-analytics','mobile-apps'].map(i=>byId[i]),`<a class="see" href="#solutions">See all 20+ →</a>`)}</div></section>
 <section><div class="wrap"><div class="head"><span class="eyebrow">The story behind our name</span><h2>MecQuad comes from E = MC².</h2><p class="muted">A small amount of mass holds a huge amount of energy. Every business idea works the same way. Our job is to release that energy.</p></div>
 <div class="terms"><div class="term g"><span class="sym">M</span><h3>Mass: your idea</h3><p>The raw potential. A process to automate, a product to launch, data waiting to be understood.</p></div>
 <div class="term g"><span class="sym">C</span><h3>C: our capability</h3><p>Engineering, AI and design skill that turns the idea into something that works.</p></div>
@@ -626,7 +626,7 @@ ${process()}${band()}`,
 services:()=>`<div class="wrap"><div class="pagehead g"><span class="eyebrow">Services</span><h1>Everything you need to go <em>digital.</em></h1><p>From your first system to AI that runs parts of your business, we cover the full journey.</p></div></div>
 <section ><div class="wrap">${svcBlock()}</div></section>${process()}${band()}`,
 
-solutions:()=>`<div class="wrap"><div class="pagehead g"><span class="eyebrow">Solutions</span><h1>${S.length} solutions, <em>ready</em> for your business.</h1><p>Pick a goal, search, or swipe through each category. Every solution is tailored to your brand, data and workflow.</p></div></div>
+solutions:()=>`<div class="wrap"><div class="pagehead g"><span class="eyebrow">Solutions</span><h1>20+ solutions, <em>tailored</em> to your business.</h1><p>Pick a goal, search, or swipe through each category. We adapt every solution to your brand, data and workflow.</p></div></div>
 <section style="padding-top:44px"><div class="wrap">
 <div class="head" style="margin-bottom:16px"><span class="eyebrow">Start with your goal</span></div>
 <div class="goals">${GOALS.map((g,i)=>`<button type="button" class="goal g" data-goal="${i}" aria-pressed="false"><strong>${g[0]}</strong><span>${g[1].length} solutions →</span></button>`).join('')}</div>
@@ -740,7 +740,7 @@ function route(){
 addEventListener('hashchange',route);
 document.addEventListener('click',e=>{const a=e.target.closest('[data-need]');if(a)wantNeed=byId[a.dataset.need].name;});
 document.getElementById('menu').addEventListener('click',e=>{const l=document.getElementById('links');const o=l.classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',o);});
-document.getElementById('fsol').innerHTML=['pos','billing','whatsapp-ai','meta-ai','content-studio','data-analytics','mobile-apps'].map(i=>`<li><a href="#${i}">${byId[i].name}</a></li>`).join('')+`<li><a href="#solutions" style="color:#f38c4f">All ${S.length} solutions →</a></li>`;
+document.getElementById('fsol').innerHTML=['pos','billing','whatsapp-ai','meta-ai','content-studio','data-analytics','mobile-apps'].map(i=>`<li><a href="#${i}">${byId[i].name}</a></li>`).join('')+`<li><a href="#solutions" style="color:#f38c4f">All 20+ solutions →</a></li>`;
 
 const ST={cat:'All',goal:null,q:''};
 function solView(){
