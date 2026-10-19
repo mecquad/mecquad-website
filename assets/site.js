@@ -170,7 +170,9 @@ const SVCS=[
 const byId=Object.fromEntries(S.map(s=>[s.id,s]));
 
 /* ---------- pieces ---------- */
-const img=(s,big)=>`<img class="photo" src="${IMG}${s.id}-640.jpg" srcset="${IMG}${s.id}-640.jpg 640w, ${IMG}${s.id}.jpg 1280w" sizes="${big?'(max-width:900px) 92vw, 560px':'(max-width:600px) 88vw, 360px'}" width="1280" height="800" alt="${ALT[s.id]||s.name}" ${big?'fetchpriority="high"':'loading="lazy"'} decoding="async" onerror="this.remove()">`;
+const img=(s,big)=>{const sz=big?'(max-width:900px) 92vw, 560px':'(max-width:600px) 88vw, 360px';
+ const tag=`<img class="photo" src="${IMG}${s.id}-640.jpg" srcset="${IMG}${s.id}-640.jpg 640w, ${IMG}${s.id}.jpg 1280w" sizes="${sz}" width="1280" height="800" alt="${ALT[s.id]||s.name}" ${big?'fetchpriority="high"':'loading="lazy"'} decoding="async" onerror="this.remove()">`;
+ return tag;};
 const card=s=>`<a class="pcard g" href="${L(s.id)}"><div class="shot">${img(s)}</div><div class="txt"><span class="tag">${s.cat}</span><h3>${s.name}</h3><p>${s.short}</p><span class="go">View solution →</span></div></a>`;
 const band=(h='Have an idea? Let\'s give it energy.')=>`<section><div class="wrap"><div class="band g"><h2>${h}</h2><div class="cta"><a class="btn" href="${L('contact')}\">Talk to us</a><a class="btn ghost" href="${L('solutions')}\">See solutions</a></div></div></div></section>`;
 const svcBlock=()=>`<div class="svcs">${SVCS.map(v=>`<article class="svc g"><div class="ico"><svg viewBox="0 0 24 24">${v[4]}</svg></div><h3>${v[0].replace('&','&amp;')}</h3><p class="line">${v[1]}</p><ul>${v[2].map(x=>`<li>${x}</li>`).join('')}</ul><div class="rels">${v[3].map(r=>`<a class="rel" href="${L(r)}">${byId[r].name}</a>`).join('')}</div></article>`).join('')}</div>`;
@@ -324,7 +326,7 @@ function route(){
  const top=s?'solutions':(P[r]?r:'home');
  document.querySelectorAll('.links a').forEach(a=>a.classList.toggle('on',a.dataset.r===top));
  if(!STATIC) document.title=s?s.name+' · MecQuad':(top==='home'?'MecQuad':top==='privacy'?'Privacy Policy · MecQuad':top[0].toUpperCase()+top.slice(1)+' · MecQuad');
- document.getElementById('links').classList.remove('open');document.getElementById('menu').setAttribute('aria-expanded','false');
+ setNav(false);
  if(!pre) scrollTo(0,0);
  document.body.classList.toggle('on-detail',!!s);
  if(s){const db=document.getElementById('demobtn');db.dataset.need=s.id;if(STATIC)db.href=L('contact')+'?need='+s.id;}
@@ -336,7 +338,23 @@ function route(){
 if(!STATIC) addEventListener('hashchange',()=>{app.removeAttribute('data-pre');route();});
 else{const legacy=()=>{const h=location.hash.slice(1);if(byId[h]||ROUTES[h])location.replace(L(h));};legacy();addEventListener('hashchange',legacy);} // old #links keep working
 document.addEventListener('click',e=>{const a=e.target.closest('[data-need]');if(a)wantNeed=byId[a.dataset.need].name;});
-document.getElementById('menu').addEventListener('click',e=>{const l=document.getElementById('links');const o=l.classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',o);});
+/* mobile menu: animated panel, backdrop, scroll lock, Esc / outside tap / link tap to close */
+const NAV={btn:document.getElementById('menu'),list:document.getElementById('links'),shade:document.getElementById('navshade')};
+function setNav(o,focus){
+ if(!NAV.list||!NAV.btn)return;
+ NAV.list.classList.toggle('open',o);if(NAV.shade)NAV.shade.classList.toggle('on',o);document.body.classList.toggle('nav-open',o);
+ NAV.btn.setAttribute('aria-expanded',String(o));NAV.btn.setAttribute('aria-label',o?'Close menu':'Open menu');
+ const lb=NAV.btn.querySelector&&NAV.btn.querySelector('.mlabel');if(lb)lb.textContent=o?'Close':'Menu';
+ if(focus){if(o){const a=NAV.list.querySelector('a');if(a)a.focus({preventScroll:true});}else NAV.btn.focus();}
+}
+NAV.btn.addEventListener('click',e=>setNav(!NAV.list.classList.contains('open'),e.detail===0));
+if(NAV.shade)NAV.shade.addEventListener('click',()=>setNav(false));
+NAV.list.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('a'))setNav(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&NAV.list.classList.contains('open'))setNav(false,true);});
+const navEl=document.querySelector('.nav');if(navEl)navEl.addEventListener('focusout',e=>{if(NAV.list.classList.contains('open')&&e.relatedTarget&&!navEl.contains(e.relatedTarget))setNav(false);});
+{const mq=matchMedia('(min-width:901px)');if(mq.addEventListener)mq.addEventListener('change',m=>{if(m.matches)setNav(false);});}
+/* header gets a solid frosted band once the page scrolls */
+if(!window.MQ_BUILD){const hdr=document.querySelector('header');const stick=()=>{if(hdr)hdr.classList.toggle('stuck',window.scrollY>4);};addEventListener('scroll',stick,{passive:true});stick();}
 const fsol=document.getElementById('fsol');
 if(!fsol.children.length) fsol.innerHTML=['pos','billing','whatsapp-ai','meta-ai','content-studio','data-analytics','mobile-apps'].map(i=>`<li><a href="${L(i)}">${byId[i].name}</a></li>`).join('')+`<li><a href="${L('solutions')}" style="color:#f38c4f">All 20+ solutions →</a></li>`;
 
@@ -441,6 +459,7 @@ function hero(){
   x.save();x.globalAlpha=alpha;x.font='800 '+size+'px Montserrat, sans-serif';x.textAlign='center';x.textBaseline='middle';
   const g=x.createLinearGradient(0,y-size/2,0,y+size/2);g.addColorStop(0,'#ffd2b0');g.addColorStop(.55,'#ff8a45');g.addColorStop(1,'#e2560f');
   x.shadowColor='rgba(236,106,34,.9)';x.shadowBlur=blur;x.fillStyle=g;x.fillText(txt,W/2,y);x.shadowBlur=blur*.4;x.fillText(txt,W/2,y);x.restore();}
+ let vis=true;
  function frame(ts){
   if(!document.body.contains(c))return;
   const t=reduce?.7:(ts%9500)/9500;
@@ -465,9 +484,10 @@ function hero(){
    x.font='800 '+W*.085+'px Montserrat, sans-serif';x.textBaseline='middle';const y=mb[1]+mb[3]+W*.1;
    const w1=x.measureText('Mec').width,w2=x.measureText('Quad').width,sx=(W-w1-w2)/2;
    x.textAlign='left';x.fillStyle='#ffffff';x.fillText('Mec',sx,y);x.fillStyle='#ec6a22';x.fillText('Quad',sx+w1,y);x.restore();}
-  if(!reduce)raf=requestAnimationFrame(frame);
+  if(!reduce&&vis)raf=requestAnimationFrame(frame);
  }
+ if('IntersectionObserver' in window){new IntersectionObserver(([en])=>{const was=vis;vis=en.isIntersecting;if(vis&&!was&&!reduce&&W){cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);}}).observe(c);}
  Promise.all([document.fonts?document.fonts.ready:0,MARK.decode?MARK.decode().catch(()=>0):0]).then(()=>{build();raf=requestAnimationFrame(frame);});
- let to;window.onresize=()=>{clearTimeout(to);to=setTimeout(()=>{if(document.body.contains(c)){build();if(reduce)frame(0);}},200);};
+ let to,lastW=innerWidth;window.onresize=()=>{if(innerWidth===lastW)return;lastW=innerWidth;clearTimeout(to);to=setTimeout(()=>{if(document.body.contains(c)){build();if(reduce)frame(0);}},200);};
 }
 if(!window.MQ_BUILD)route();
